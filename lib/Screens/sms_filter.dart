@@ -18,7 +18,7 @@ class _SmsFilterState extends State<SmsFilter> {
   SmsQuery query = SmsQuery();
   List<SmsMessage> displayMessages = [];
   Controller controller = Get.put(Controller());
-  var sum = 0.0;
+  double sum = 0.0;
 
   @override
   void initState() {
@@ -142,6 +142,7 @@ class _SmsFilterState extends State<SmsFilter> {
                             padding: EdgeInsets.zero,
                             itemBuilder: (BuildContext context, int index) {
                               var body = displayMessages[index].body;
+                              body=body.toString().replaceAll(",", "");
                               var date =
                                   "${displayMessages[index].date?.day}/${displayMessages[index].date?.month}/${displayMessages[index].date?.year} ";
                               return Card(
@@ -172,8 +173,9 @@ class _SmsFilterState extends State<SmsFilter> {
                                       ),
                                       const Divider(thickness: 2),
                                       Text(
-                                        getAmount(value: body.toString()),
-                                        maxLines: 1,
+                                        "AED : ${getTransactionAmount(body)}",
+                                        //getAmount(value: body.toString()),
+                                        //maxLines: 1,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       )
@@ -197,7 +199,7 @@ class _SmsFilterState extends State<SmsFilter> {
                       color: Colors.white70,
                     ),
                     child: Text(
-                      "Total Amount : $sum AED",
+                      "Total Amount : ${sum.toStringAsFixed(2)} AED",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: const Color(0xff006F88),
@@ -223,6 +225,7 @@ class _SmsFilterState extends State<SmsFilter> {
     for (SmsMessage sms in messages) {
       String sender = sms.sender!.toLowerCase();
       var body = sms.body;
+      body=body?.replaceAll(",", "");
 
       if (sms.kind == SmsMessageKind.received) {
         if (isMobileNumberValid(sms.sender.toString())) {
@@ -230,7 +233,8 @@ class _SmsFilterState extends State<SmsFilter> {
           if (sender.contains(key)) {
             if (body!.contains("AED")) {
               //   if(isTransactionSms(body)!=null)
-              if (getAmount(value: body) != null) {
+              if (getTransactionAmount(body) != null) {
+
                 displayMessages.add(sms);
               }
             }
@@ -270,31 +274,41 @@ class _SmsFilterState extends State<SmsFilter> {
     return false;
   }
 
-  String? getTransactionAmount(String sms) {
+  double? getTransactionAmount(String sms) {
+
     RegExp exp = RegExp(r"(\b\d+\.\d+\b)");
-    String str = "Parse my string ";
-    var match = exp.firstMatch(str);
+    var match = exp.firstMatch(sms);
     if (match != null) {
-      return match[0];
+      print(match[0]);
+      return double.parse(match[0].toString());
     } else {
       return null;
     }
   }
 
   String getAmount({required String value}) {
+    value=value.replaceAll(",", "");
     String p = r"[AED]* [+-]?([0-9]*[.])?[0-9]+";
 
     RegExp regExp = RegExp(p);
-
-    return regExp.stringMatch(value)!;
+try
+{
+  return regExp.stringMatch(value)!;
+}
+  catch(E)
+    {
+      return "";
+    }
   }
 
   void calculateTotal() {
     sum = 0.0;
     for (SmsMessage sms in displayMessages) {
       try {
+        var temp=sms.body!.replaceAll(",", "");
+        print(getTransactionAmount(temp));
         sum = sum +
-            double.parse(getTransactionAmount(sms.body.toString()).toString());
+            double.parse(getTransactionAmount(temp).toString());
         setState(() {
           controller.update();
         });
