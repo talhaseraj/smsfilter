@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:smsfilter/Controllers/controller.dart';
 
 import '../colors.dart';
-import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:get/get.dart';
 
 class SmsFilter extends StatefulWidget {
@@ -14,16 +13,12 @@ class SmsFilter extends StatefulWidget {
 
 class _SmsFilterState extends State<SmsFilter> {
   TextEditingController searchController = TextEditingController();
-  SmsQuery query = SmsQuery();
-  List<SmsMessage> displayMessages = [];
-  Controller controller = Get.put(Controller());
-  double sum = 0.0;
-  bool found = true;
+ // Controller controller = Get.put(Controller());
 
   @override
   void initState() {
     // TODO: implement initState
-    getMessages("");
+   // controller.getMessages();
     super.initState();
   }
 
@@ -31,7 +26,9 @@ class _SmsFilterState extends State<SmsFilter> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SingleChildScrollView(
+      body:GetBuilder<Controller>( // specify type as Controller
+        init: Controller(), // intialize with the Controller
+    builder: (controller) => SingleChildScrollView(
         child: Container(
           height: size.height,
           width: size.width,
@@ -46,23 +43,30 @@ class _SmsFilterState extends State<SmsFilter> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Icon(
+                    children:  [
+                      const Icon(
                         Icons.menu,
                         color: Colors.white,
                         size: 30,
                       ),
-                      Text(
+                      const Text(
                         "SMS FILTER",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
-                      Icon(
-                        Icons.settings,
-                        color: Colors.white,
-                        size: 30,
+                      InkWell(
+
+                        child: const Icon(
+                          Icons.refresh,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onTap: (){
+
+                          controller.getMessages();
+                        },
                       ),
                     ],
                   ),
@@ -100,14 +104,18 @@ class _SmsFilterState extends State<SmsFilter> {
                           width: size.width * .8,
                           child: TextField(
                             onChanged: (input) {
-                              setState(() {
-                                displayMessages.clear();
-                              });
-                              if (input.isEmpty) {
-                                getMessages("");
-                              } else {
-                                getMessages(input);
-                              }
+                             // setState(() {
+                                print(controller.displayMessages.length);
+                                print(controller.allMessages.length);
+
+                                 controller.searchMessages(input);
+                                // if(input=="")
+                                // {
+                                //   controller.displayMessages=controller.allMessages;
+                                // }
+
+                            //  });
+
                             },
                             controller: searchController,
                             decoration: const InputDecoration(
@@ -134,19 +142,19 @@ class _SmsFilterState extends State<SmsFilter> {
                     color: Colors.white70,
                   ),
                   child: Obx(
-                    () => found? controller.isLoading.value
+                    () => controller.found.value? controller.isLoading.value
                         ? const CupertinoActivityIndicator(
                             radius: 50,
                             color: Colors.white,
                           )
                         : ListView.builder(
-                            itemCount: displayMessages.length,
+                            itemCount: controller.displayMessages.length,
                             padding: EdgeInsets.zero,
                             itemBuilder: (BuildContext context, int index) {
-                              var body = displayMessages[index].body;
+                              var body = controller.displayMessages[index].body;
                               body=body.toString().replaceAll(",", "");
                               var date =
-                                  "${displayMessages[index].date?.day}/${displayMessages[index].date?.month}/${displayMessages[index].date?.year} ";
+                                  "${controller.displayMessages[index].date?.day}/${controller.displayMessages[index].date?.month}/${controller.displayMessages[index].date?.year} ";
                               return Card(
                                 elevation: 3,
                                 child: Padding(
@@ -160,7 +168,7 @@ class _SmsFilterState extends State<SmsFilter> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            displayMessages[index]
+                                            controller.displayMessages[index]
                                                 .sender
                                                 .toString(),
                                             style: TextStyle(
@@ -175,7 +183,7 @@ class _SmsFilterState extends State<SmsFilter> {
                                       ),
                                       const Divider(thickness: 2),
                                       Text(
-                                        "AED : ${getTransactionAmount(body)}",
+                                        "AED : ${controller.getTransactionAmount(body)}",
                                         //getAmount(value: body.toString()),
                                         //maxLines: 1,
                                         style: const TextStyle(
@@ -201,8 +209,8 @@ class _SmsFilterState extends State<SmsFilter> {
                       borderRadius: BorderRadius.circular(25),
                       color: Colors.white70,
                     ),
-                    child: Text(
-                      "Total Amount : ${sum.toStringAsFixed(2)} AED",
+                    child: Obx(()=> Text(
+                      "Total Amount : ${controller.sum.toStringAsFixed(2)} AED",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: const Color(0xff006F88),
@@ -210,126 +218,14 @@ class _SmsFilterState extends State<SmsFilter> {
                         fontWeight: FontWeight.bold,
                         fontFamily: "MontRegular",
                       ),
-                    ),
+                    ),),
                   ),
                 ),
               ]),
         ),
-      ),
+    )),
     );
   }
 
-  Future<void> getMessages(String key) async {
-    setState(() {
-      found =true;
 
-    });
-    key = key.toLowerCase();
-    displayMessages.clear();
-    controller.isLoading.value = true;
-
-    List<SmsMessage> messages = await query.getAllSms;
-    for (SmsMessage sms in messages) {
-      String sender = sms.sender!.toLowerCase();
-      var body = sms.body;
-      body=body?.replaceAll(",", "");
-
-      if (sms.kind == SmsMessageKind.received) {
-        if (isMobileNumberValid(sms.sender.toString())) {
-        } else {
-          if (sender.contains(key)) {
-            if (body!.contains("AED")) {
-              //   if(isTransactionSms(body)!=null)
-              if (getTransactionAmount(body) != null) {
-
-                displayMessages.add(sms);
-              }
-            }
-
-            // if(isTransactionSms(sms.body.toString()))
-            //   {
-            //
-            //   }
-
-          }
-        }
-      }
-    }
-    if (displayMessages.isEmpty) {
-      controller.isLoading.value = true;
-
-      Get.snackbar("Search Result", "0 Results");
-      setState(() {
-        found =false;
-        controller.update();
-
-      });
-    } else {
-      Get.closeAllSnackbars();
-
-      Get.snackbar("Search Result", "${displayMessages.length} Results");
-      calculateTotal();
-      controller.isLoading.value = false;
-      bool found =false;
-
-      controller.update();
-    }
-  }
-
-  bool isMobileNumberValid(String phoneNumber) {
-    String regexPattern = r'^(?:[+0][1-9])?[0-9]{10,12}$';
-    var regExp = RegExp(regexPattern);
-
-    if (phoneNumber.isEmpty) {
-      return false;
-    } else if (regExp.hasMatch(phoneNumber)) {
-      return true;
-    }
-    return false;
-  }
-
-  double? getTransactionAmount(String sms) {
-
-   // RegExp exp = RegExp(r"(\b\d+\.\d+\b)");
-    RegExp exp = RegExp(r"(\b\d+\.\d{2})");
-    var match = exp.firstMatch(sms);
-    if (match != null) {
-      print(match[0]);
-      return double.parse(match[0].toString());
-    } else {
-      return null;
-    }
-  }
-
-  String getAmount({required String value}) {
-    value=value.replaceAll(",", "");
-    String p = r"[AED]* [+-]?([0-9]*[.])?[0-9]+";
-
-    RegExp regExp = RegExp(p);
-try
-{
-  return regExp.stringMatch(value)!;
-}
-  catch(E)
-    {
-      return "";
-    }
-  }
-
-  void calculateTotal() {
-    sum = 0.0;
-    for (SmsMessage sms in displayMessages) {
-      try {
-        var temp=sms.body!.replaceAll(",", "");
-        print(getTransactionAmount(temp));
-        sum = sum +
-            double.parse(getTransactionAmount(temp).toString());
-        setState(() {
-          controller.update();
-        });
-      } catch (e) {
-        print(e);
-      }
-    }
-  }
 }
