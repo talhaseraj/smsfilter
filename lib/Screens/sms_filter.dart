@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 
 class SmsFilter extends StatefulWidget {
   const SmsFilter({Key? key}) : super(key: key);
-
   @override
   State<SmsFilter> createState() => _SmsFilterState();
 }
@@ -19,6 +18,7 @@ class _SmsFilterState extends State<SmsFilter> {
   List<SmsMessage> displayMessages = [];
   Controller controller = Get.put(Controller());
   double sum = 0.0;
+  bool found = true;
 
   @override
   void initState() {
@@ -30,7 +30,6 @@ class _SmsFilterState extends State<SmsFilter> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -101,6 +100,9 @@ class _SmsFilterState extends State<SmsFilter> {
                           width: size.width * .8,
                           child: TextField(
                             onChanged: (input) {
+                              setState(() {
+                                displayMessages.clear();
+                              });
                               if (input.isEmpty) {
                                 getMessages("");
                               } else {
@@ -132,7 +134,7 @@ class _SmsFilterState extends State<SmsFilter> {
                     color: Colors.white70,
                   ),
                   child: Obx(
-                    () => controller.isLoading.value
+                    () => found? controller.isLoading.value
                         ? const CupertinoActivityIndicator(
                             radius: 50,
                             color: Colors.white,
@@ -184,7 +186,8 @@ class _SmsFilterState extends State<SmsFilter> {
                                 ),
                               );
                             },
-                          ),
+                          ):
+                    const Center(child: Icon(Icons.search_off,size: 100,)),
                   ),
                 )),
                 Padding(
@@ -217,6 +220,10 @@ class _SmsFilterState extends State<SmsFilter> {
   }
 
   Future<void> getMessages(String key) async {
+    setState(() {
+      found =true;
+
+    });
     key = key.toLowerCase();
     displayMessages.clear();
     controller.isLoading.value = true;
@@ -250,14 +257,21 @@ class _SmsFilterState extends State<SmsFilter> {
     }
     if (displayMessages.isEmpty) {
       controller.isLoading.value = true;
+
       Get.snackbar("Search Result", "0 Results");
-      controller.update();
+      setState(() {
+        found =false;
+        controller.update();
+
+      });
     } else {
       Get.closeAllSnackbars();
 
       Get.snackbar("Search Result", "${displayMessages.length} Results");
       calculateTotal();
       controller.isLoading.value = false;
+      bool found =false;
+
       controller.update();
     }
   }
@@ -276,7 +290,8 @@ class _SmsFilterState extends State<SmsFilter> {
 
   double? getTransactionAmount(String sms) {
 
-    RegExp exp = RegExp(r"(\b\d+\.\d+\b)");
+   // RegExp exp = RegExp(r"(\b\d+\.\d+\b)");
+    RegExp exp = RegExp(r"(\b\d+\.\d{2})");
     var match = exp.firstMatch(sms);
     if (match != null) {
       print(match[0]);
