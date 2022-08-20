@@ -151,7 +151,7 @@ class Controller extends GetxController {
     for (SmsMessage sms in displayMessages) {
 
       var dateTime = sms.date;
-      var month = DateFormat.MMMM().format(dateTime!);
+      var month = DateFormat.yM().format(dateTime!);
 
       int monthIndex = displayMessages.indexWhere((element) {
         var temp = element.date;
