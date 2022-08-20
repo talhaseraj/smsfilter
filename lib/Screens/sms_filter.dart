@@ -149,7 +149,7 @@ class _SmsFilterState extends State<SmsFilter> {
                                               controller.displayMessages[index];
                                           var dateTime = sms.date;
 
-                                          print(DateFormat.MMMM()
+                                          print(DateFormat.yM()
                                               .format(dateTime!));
                                           var body = sms.body;
                                           body = body
@@ -158,14 +158,14 @@ class _SmsFilterState extends State<SmsFilter> {
                                           var date =
                                               "${dateTime?.day}/${dateTime?.month}/${dateTime.year} ";
 
-                                          month = DateFormat.MMMM()
+                                          month = DateFormat.yM()
                                               .format(dateTime!);
 
                                           int monthIndex = controller
                                               .displayMessages
                                               .indexWhere((element) {
                                             var temp = element.date;
-                                            return DateFormat.MMMM()
+                                            return DateFormat.yM()
                                                     .format(temp!) ==
                                                 month;
                                           });
