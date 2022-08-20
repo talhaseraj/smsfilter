@@ -17,7 +17,6 @@ class _SmsFilterState extends State<SmsFilter> {
   TextEditingController searchController = TextEditingController();
 
   var month;
-  List monthCount = [];
 
   @override
   void initState() {
@@ -148,18 +147,15 @@ class _SmsFilterState extends State<SmsFilter> {
                                           SmsMessage sms =
                                               controller.displayMessages[index];
                                           var dateTime = sms.date;
-
-                                          print(DateFormat.yM()
-                                              .format(dateTime!));
                                           var body = sms.body;
                                           body = body
                                               .toString()
                                               .replaceAll(",", "");
                                           var date =
-                                              "${dateTime?.day}/${dateTime?.month}/${dateTime.year} ";
+                                              "${dateTime?.day}/${dateTime?.month}/${dateTime!.year} ";
 
-                                          month = DateFormat.yM()
-                                              .format(dateTime!);
+                                          month =
+                                              DateFormat.yM().format(dateTime!);
 
                                           int monthIndex = controller
                                               .displayMessages
@@ -255,7 +251,8 @@ class _SmsFilterState extends State<SmsFilter> {
                           padding: const EdgeInsets.only(
                               top: 15, bottom: 30, left: 15, right: 15),
                           child: Container(
-                            padding:  const EdgeInsets.symmetric(horizontal: 25,vertical: 15),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 25, vertical: 15),
                             //    height: size.height * .14,
                             width: size.width,
                             decoration: BoxDecoration(
@@ -263,7 +260,9 @@ class _SmsFilterState extends State<SmsFilter> {
                               color: Colors.white70,
                             ),
                             child: Obx(
-                              () => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              () => Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "${controller.sum.toStringAsFixed(2)} AED",

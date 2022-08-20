@@ -73,10 +73,7 @@ class Controller extends GetxController {
     key = key.toLowerCase();
 
     displayMessages = [];
-    print(key);
     for (SmsMessage sms in allMessages) {
-      print(sms.sender);
-
       String sender = sms.sender!.toLowerCase();
       if (sender.contains(key)) {
         displayMessages.add(sms);
@@ -167,7 +164,6 @@ class Controller extends GetxController {
       else
         {
           temp.add(monthIndex);
-          print(temp.length);
         }
 
     }
