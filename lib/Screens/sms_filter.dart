@@ -46,11 +46,7 @@ class _SmsFilterState extends State<SmsFilter> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(
-                                Icons.menu,
-                                color: Colors.white,
-                                size: 30,
-                              ),
+                              const SizedBox(),
                               const Text(
                                 "SMS FILTER",
                                 style: TextStyle(
@@ -65,6 +61,7 @@ class _SmsFilterState extends State<SmsFilter> {
                                   size: 30,
                                 ),
                                 onTap: () {
+                                  searchController.text="";
                                   controller.getMessages();
                                 },
                               ),

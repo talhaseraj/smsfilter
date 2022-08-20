@@ -154,8 +154,8 @@ class Controller extends GetxController {
       var month = DateFormat.yM().format(dateTime!);
 
       int monthIndex = displayMessages.indexWhere((element) {
-        var temp = element.date;
-        return DateFormat.yM().format(temp!) == month;
+        var dateTime = element.date;
+        return DateFormat.yM().format(dateTime!) == month;
       });
       if(temp.contains(monthIndex))
         {
