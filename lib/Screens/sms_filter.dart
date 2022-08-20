@@ -17,6 +17,7 @@ class _SmsFilterState extends State<SmsFilter> {
   TextEditingController searchController = TextEditingController();
 
   var month;
+  List monthCount = [];
 
   @override
   void initState() {
@@ -174,14 +175,21 @@ class _SmsFilterState extends State<SmsFilter> {
                                               if (index == monthIndex)
                                                 Card(
                                                   child: Center(
-                                                     heightFactor: 2.3,
+                                                    heightFactor: 2.3,
                                                     child: Text(
                                                         DateFormat.MMMM()
                                                             .format(dateTime!),
-                                                    style: TextStyle(fontWeight: FontWeight.bold,fontSize: size.width*.05,color: Colors.white)),
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize:
+                                                                size.width *
+                                                                    .05,
+                                                            color:
+                                                                Colors.white)),
                                                   ),
-                                                  color: const Color(0xff00D3FE)
-                                                  ,
+                                                  color:
+                                                      const Color(0xff00D3FE),
                                                 ),
                                               Card(
                                                 elevation: 3,
@@ -247,7 +255,7 @@ class _SmsFilterState extends State<SmsFilter> {
                           padding: const EdgeInsets.only(
                               top: 15, bottom: 30, left: 15, right: 15),
                           child: Container(
-                            padding: const EdgeInsets.only(top: 15, bottom: 15),
+                            padding:  const EdgeInsets.symmetric(horizontal: 25,vertical: 15),
                             //    height: size.height * .14,
                             width: size.width,
                             decoration: BoxDecoration(
@@ -255,15 +263,29 @@ class _SmsFilterState extends State<SmsFilter> {
                               color: Colors.white70,
                             ),
                             child: Obx(
-                              () => Text(
-                                "Total Amount : ${controller.sum.toStringAsFixed(2)} AED",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: const Color(0xff006F88),
-                                  fontSize: size.width * .05,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: "MontRegular",
-                                ),
+                              () => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "${controller.sum.toStringAsFixed(2)} AED",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: const Color(0xff006F88),
+                                      fontSize: size.width * .05,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "MontRegular",
+                                    ),
+                                  ),
+                                  Text(
+                                    "${controller.numberOfMonths} Months",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: const Color(0xff006F88),
+                                      fontSize: size.width * .05,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "MontRegular",
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
