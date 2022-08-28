@@ -152,7 +152,7 @@ class _SmsFilterState extends State<SmsFilter> {
                                               "${dateTime?.day}/${dateTime?.month}/${dateTime!.year} ";
 
                                           month =
-                                              DateFormat.yM().format(dateTime!);
+                                              DateFormat.yM().format(dateTime);
 
                                           int monthIndex = controller
                                               .displayMessages
@@ -171,7 +171,7 @@ class _SmsFilterState extends State<SmsFilter> {
                                                     heightFactor: 2.3,
                                                     child: Text(
                                                         DateFormat.MMMM()
-                                                            .format(dateTime!),
+                                                            .format(dateTime),
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,

@@ -1,13 +1,21 @@
 import 'package:get/get.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:intl/intl.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 class Controller extends GetxController {
   @override
-  void onInit() {
+  void onInit() async{
     // TODO: implement onInit
     super.onInit();
-    getMessages();
+    try
+    {
+      getMessages();
+
+
+    }catch(e)
+    {
+
+    }
   }
 
   var isLoading = true.obs;
@@ -20,10 +28,21 @@ class Controller extends GetxController {
   var numberOfMonths = 0.obs;
 
   Future<void> getMessages() async {
+
+
+
     found.value = true;
     displayMessages.clear();
     allMessages.clear();
     isLoading.value = true;
+
+    var permission = await Permission.sms.status;
+    if (permission.isGranted) {
+
+
+    } else {
+      await Permission.sms.request();
+    }
 
     List<SmsMessage> messages = await query.getAllSms;
     for (SmsMessage sms in messages) {
